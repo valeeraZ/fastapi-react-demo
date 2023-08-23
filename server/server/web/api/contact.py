@@ -45,3 +45,23 @@ async def get_contacts(
     :return: a list of contact read models
     """
     return await contact_query_service.find_contacts()
+
+
+@router.get(
+    "/{contact_id}",
+    response_model=ContactReadModel,
+    status_code=status.HTTP_200_OK,
+)
+async def get_contact_by_id(
+    contact_id: int,
+    contact_query_service: ContactQuery = Depends(get_contact_query_service),
+) -> ContactReadModel:
+    """
+    Get a contact by id.
+
+    :param contact_id: the id of the contact
+    :param contact_query_service: query service \
+            from the dependency injection
+    :return: a contact read model
+    """
+    return await contact_query_service.find_contact_by_id(contact_id)

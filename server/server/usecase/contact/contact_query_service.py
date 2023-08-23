@@ -1,4 +1,5 @@
 from fastapi import Depends
+from server.exception.base_exception import NotFoundError
 from server.infra.db.repository.contact import ContactRepository, get_contact_repository
 from server.usecase.contact.contact_query_model import ContactReadModel
 
@@ -12,6 +13,12 @@ class ContactQuery:
             ContactReadModel.model_validate(contact)
             for contact in await self.contact_repository.get_many()
         ]
+
+    async def find_contact_by_id(self, contact_id: int) -> ContactReadModel:
+        contact = await self.contact_repository.get_by_id(contact_id)
+        if contact is None:
+            raise NotFoundError(f"Contact {contact_id}")
+        return ContactReadModel.model_validate(contact)
 
 
 def get_contact_query_service(
