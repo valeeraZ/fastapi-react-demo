@@ -62,3 +62,24 @@ jobs:
       working-directory: ./server
     - name: Run mypy check
       run: poetry run --directory server mypy .
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+    - name: Install deps
+      run: |
+        cd server
+        poetry install
+      working-directory: ./server
+    - name: Run unittests
+      run: |
+        cd server
+        poetry run python -m unittest discover
