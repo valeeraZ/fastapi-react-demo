@@ -65,7 +65,7 @@ class TestContactsAPI(unittest.IsolatedAsyncioTestCase):
         }
         create_model = contact_dict_a_create
         async with AsyncClient(app=self.app, base_url="http://test") as client:
-            response = await client.post("/api/contacts/", json=create_model)
+            response = await client.post("/api/contacts", json=create_model)
 
         mock_get_contact_command_service.create_contact.assert_called_once_with(
             ContactCreateModel(**create_model),
@@ -88,7 +88,7 @@ class TestContactsAPI(unittest.IsolatedAsyncioTestCase):
             get_contact_query_service: lambda: mock_get_contact_query_service,
         }
         async with AsyncClient(app=self.app, base_url="http://test") as client:
-            response = await client.get("/api/contacts/")
+            response = await client.get("/api/contacts")
 
         mock_get_contact_query_service.find_contacts.assert_called_once()
         self.assertEqual(response.status_code, 200)

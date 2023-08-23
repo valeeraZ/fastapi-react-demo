@@ -13,7 +13,7 @@ from server.usecase.contact.contact_query_service import (
 router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 
-@router.post("/", response_model=ContactReadModel, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ContactReadModel, status_code=status.HTTP_201_CREATED)
 async def create_contact(
     contact_create_model: ContactCreateModel,
     contact_command_service: ContactCommand = Depends(get_contact_command_service),
@@ -30,7 +30,7 @@ async def create_contact(
 
 
 @router.get(
-    "/",
+    "",
     response_model=list[ContactReadModel],
     status_code=status.HTTP_200_OK,
 )
