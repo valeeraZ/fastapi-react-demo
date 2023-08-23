@@ -21,7 +21,7 @@ jobs:
         poetry install
       working-directory: ./server
     - name: Run black check
-      run: poetry run --directory server black --check
+      run: poetry run --directory server black --check .
   flake8:
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +40,9 @@ jobs:
         poetry install
       working-directory: ./server
     - name: Run flake8 check
-      run: poetry run --directory server flake8 --count
+      run: |
+        cd server
+        poetry run --directory server flake8 --count
   mypy:
     runs-on: ubuntu-latest
     steps:
