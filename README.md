@@ -19,6 +19,8 @@ https://github.com/valeeraZ/descartes-app/assets/39196828/ec9373bd-5797-46e6-94e
 
 
 # Architecture
+![archi-descartes](https://github.com/valeeraZ/descartes-app/assets/39196828/c953f735-4668-4f02-87c0-b5f282a30839)
+
 
 The server is a FastAPI application that uses a PostgreSQL database. The client is a React application with Next.js that uses the server API.
 
