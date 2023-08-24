@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ./server
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DESCARTES_HOST: 0.0.0.0
+      DESCARTES_DB_HOST: descartes-db
+      DESCARTES_DB_PORT: 5432
+      DESCARTES_DB_USER: descartes
+      DESCARTES_DB_PASS: descartes
+      DESCARTES_DB_BASE: descartes
+    ports:
+    - 8000:8000
+  db:
+    image: postgres:13.8-bullseye
+    hostname: descartes-db
+    environment:
+      POSTGRES_PASSWORD: "descartes"
+      POSTGRES_USER: "descartes"
+      POSTGRES_DB: "descartes"
+    volumes:
+    - descartes-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U descartes
+      interval: 2s
+      timeout: 3s
+      retries: 40
+    ports:
+    - 5432:5432
+  client:
+    build: ./client
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+    - "3000:3000"
+    environment:
+    - REACT_APP_API_URL=http://api:8000/api
+volumes:
+  descartes-db-data:
+    name: descartes-db-data
