@@ -1,0 +1,85 @@
+name: Testing Server
+
+on: push
+
+jobs:
+  black:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+    - name: Install deps
+      run: |
+        cd server
+        poetry install
+      working-directory: ./server
+    - name: Run black check
+      run: poetry run --directory server black --check .
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+    - name: Install deps
+      run: |
+        cd server
+        poetry install
+      working-directory: ./server
+    - name: Run flake8 check
+      run: |
+        cd server
+        poetry run --directory server flake8 --count
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+    - name: Install deps
+      run: |
+        cd server
+        poetry install
+      working-directory: ./server
+    - name: Run mypy check
+      run: poetry run --directory server mypy .
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+    - name: Install deps
+      run: |
+        cd server
+        poetry install
+      working-directory: ./server
+    - name: Run unittests
+      run: |
+        cd server
+        poetry run python -m unittest discover
