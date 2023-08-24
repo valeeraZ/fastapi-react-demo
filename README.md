@@ -2,12 +2,17 @@
 
 This project template using ReactJS & Python that can be used for Descartes Underwriting technical test.
 
-To install and run this template, use
+To install and run this project:
 
-```bash
-npm install
-npm start
 ```
+docker-compose up --build
+```
+
+# Demo
+
+
+https://github.com/valeeraZ/descartes-app/assets/39196828/ec9373bd-5797-46e6-94e8-e57cddd863ba
+
 
 # Instructions
 
