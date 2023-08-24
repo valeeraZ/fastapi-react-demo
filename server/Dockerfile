@@ -25,3 +25,5 @@ COPY . /app/src/
 RUN poetry install --only main
 
 CMD ["/usr/local/bin/python", "-m", "server"]
+
+HEALTHCHECK CMD curl http://localhost:8000/api/health || exit 1
