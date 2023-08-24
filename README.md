@@ -8,11 +8,26 @@ To install and run this project:
 docker-compose up --build
 ```
 
-# Demo
+The first install and run will take a while, because it will install all the dependencies and build the images.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+To run separately the server or client, please see the README.md in the server and client folders.
+
+# Demo
 
 https://github.com/valeeraZ/descartes-app/assets/39196828/ec9373bd-5797-46e6-94e8-e57cddd863ba
 
+
+# Architecture
+
+The server is a FastAPI application that uses a PostgreSQL database. The client is a React application with Next.js that uses the server API.
+
+For the server, the FastAPI uses a router to handle the requests. The router uses a query service and a command service to handle the business logic with the contact read model and write model. The service uses a repository to access a PostgreSQL database by CRUD actions with SQLAlchemy models.
+
+# CI/CD
+
+
+The CI/CD is done with Github Actions. The workflow is triggered on push and pull request on the main branch. The workflow will run the unit tests and the linter of the code in server.
 
 # Instructions
 
