@@ -1,85 +1,77 @@
-name: Testing Server
+name: Server CI
 
-on: push
+on:
+  push:
+  pull_request:
 
 jobs:
-  black:
+  ruff:
+    name: Ruff (format + lint)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - name: Install and configure Poetry
+    - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        virtualenvs-create: false
-    - name: Install deps
-      run: |
-        cd server
-        poetry install
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Install dependencies
       working-directory: ./server
-    - name: Run black check
-      run: poetry run --directory server black --check .
-  flake8:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11'
-    - name: Install and configure Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: false
-    - name: Install deps
-      run: |
-        cd server
-        poetry install
+      run: poetry install --no-interaction --with dev
+    - name: Ruff format check
       working-directory: ./server
-    - name: Run flake8 check
-      run: |
-        cd server
-        poetry run --directory server flake8 --count
+      run: poetry run ruff format --check .
+    - name: Ruff lint check
+      working-directory: ./server
+      run: poetry run ruff check .
+
   mypy:
+    name: mypy (type check)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - name: Install and configure Poetry
+    - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        virtualenvs-create: false
-    - name: Install deps
-      run: |
-        cd server
-        poetry install
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Install dependencies
       working-directory: ./server
-    - name: Run mypy check
-      run: poetry run --directory server mypy .
-  unittest:
+      run: poetry install --no-interaction --with dev
+    - name: Run mypy
+      working-directory: ./server
+      run: poetry run mypy .
+
+  tests:
+    name: Pytest (unit + coverage)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - name: Install and configure Poetry
+    - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        virtualenvs-create: false
-    - name: Install deps
-      run: |
-        cd server
-        poetry install
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Install dependencies
       working-directory: ./server
-    - name: Run unittests
-      run: |
-        cd server
-        poetry run python -m unittest discover
+      run: poetry install --no-interaction --with dev
+    - name: Run tests with coverage
+      working-directory: ./server
+      run: poetry run pytest -q --cov=server --cov-report=term-missing --cov-report=xml
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-xml
+        path: server/coverage.xml
