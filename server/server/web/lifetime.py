@@ -1,23 +1,46 @@
-from typing import Awaitable, Callable
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
 from server.infra.db.meta import meta
 from server.infra.db.model import load_all_models
 from server.settings import settings
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     """
     Creates connection to the database.
 
-    This function creates SQLAlchemy engine instance,
-    session_factory for creating sessions
+    This function creates SQLAlchemy engine instance with optimized
+    connection pool settings, session_factory for creating sessions
     and stores them in the application's state property.
 
     :param app: fastAPI application.
     """
-    engine = create_async_engine(str(settings.db_url), echo=settings.db_echo)
+    engine = create_async_engine(
+        str(settings.db_url),
+        echo=settings.db_echo,
+        # Connection pool settings
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
+        pool_timeout=settings.db_pool_timeout,
+        pool_recycle=settings.db_pool_recycle,
+        pool_pre_ping=True,  # Validate connections before use
+        # Query execution settings
+        query_cache_size=1200,  # Size of the query cache
+        # Connection arguments passed to asyncpg
+        connect_args={
+            "server_settings": {
+                "search_path": settings.db_schema,
+                "timezone": "UTC",
+                "application_name": "fastapi_demo_app",
+            },
+            "command_timeout": settings.db_query_timeout,
+            "statement_cache_size": 0,  # Disable prepared statement cache
+        },
+    )
     session_factory = async_sessionmaker(
         engine,
         expire_on_commit=False,
@@ -27,47 +50,47 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
 
 
 async def _create_tables() -> None:  # pragma: no cover
-    """Populates tables in the database."""
+    """Populates tables in the database with optimized connection settings."""
     load_all_models()
-    engine = create_async_engine(str(settings.db_url))
+    engine = create_async_engine(
+        str(settings.db_url),
+        echo=settings.db_echo,
+        # Minimal pool for table creation (temporary operation)
+        pool_size=1,
+        max_overflow=0,
+        pool_timeout=30,
+        pool_recycle=3600,
+        pool_pre_ping=True,
+        connect_args={
+            "server_settings": {
+                "search_path": settings.db_schema,
+                "timezone": "UTC",
+                "application_name": "fastapi_demo_migration",
+            },
+            "command_timeout": 300,  # Longer timeout for DDL operations
+        },
+    )
     async with engine.begin() as connection:
         await connection.run_sync(meta.create_all)
     await engine.dispose()
 
 
-def register_startup_event(
-    app: FastAPI,
-) -> Callable[[], Awaitable[None]]:  # pragma: no cover
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # pragma: no cover
     """
-    Actions to run on application startup.
+    Manages the application lifespan.
 
-    This function uses fastAPI app to store data
-    in the state, such as db_engine.
+    This function handles both startup and shutdown events
+    using FastAPI's modern lifespan pattern.
 
     :param app: the fastAPI application.
-    :return: function that actually performs actions.
+    :yields: control to the application during its lifetime.
     """
+    # Startup
+    _setup_db(app)
+    await _create_tables()
 
-    @app.on_event("startup")
-    async def _startup() -> None:  # noqa: WPS430
-        _setup_db(app)
-        await _create_tables()
+    yield
 
-    return _startup
-
-
-def register_shutdown_event(
-    app: FastAPI,
-) -> Callable[[], Awaitable[None]]:  # pragma: no cover
-    """
-    Actions to run on application's shutdown.
-
-    :param app: fastAPI application.
-    :return: function that actually performs actions.
-    """
-
-    @app.on_event("shutdown")
-    async def _shutdown() -> None:  # noqa: WPS430
-        await app.state.db_engine.dispose()
-
-    return _shutdown
+    # Shutdown
+    await app.state.db_engine.dispose()

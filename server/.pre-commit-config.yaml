@@ -23,34 +23,20 @@ repos:
     - --preserve-quotes
     - --indent=2
 
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.12.4
+  hooks:
+    # Run the linter.
+  - id: ruff
+    args: [--fix]
+    types_or: [python, pyi, jupyter]
+    # Run the formatter.
+  - id: ruff-format
+    types_or: [python, pyi, jupyter]
+
 - repo: local
   hooks:
-  - id: autoflake
-    name: autoflake
-    entry: poetry run --directory server autoflake
-    language: system
-    types: [python]
-    args: [--in-place, --remove-all-unused-imports, --remove-duplicate-keys]
-
-  - id: black
-    name: Format with Black
-    entry: poetry run --directory server black
-    language: system
-    types: [python]
-
-  - id: isort
-    name: isort
-    entry: poetry run --directory server isort
-    language: system
-    types: [python]
-
-  - id: flake8
-    name: Check with Flake8
-    entry: poetry run --directory server flake8
-    language: system
-    types: [python]
-    args: [--count, '--config=server/.flake8']
-
   - id: mypy
     name: Validate types with MyPy
     entry: poetry run --directory server mypy

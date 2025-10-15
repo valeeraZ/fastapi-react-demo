@@ -1,5 +1,6 @@
-from server.infra.db.meta import meta
 from sqlalchemy.orm import DeclarativeBase
+
+from server.infra.db.meta import meta
 
 
 class Base(DeclarativeBase):

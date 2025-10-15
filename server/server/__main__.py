@@ -1,4 +1,5 @@
 import uvicorn
+
 from server.settings import settings
 
 

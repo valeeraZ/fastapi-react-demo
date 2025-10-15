@@ -1,12 +1,14 @@
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from server.infra.db.dependencies import get_db_session
 from server.infra.db.model.contact_dto import ContactDTO
 from server.infra.db.repository.base import BaseRepository
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class ContactRepository(BaseRepository[ContactDTO]):
-    pass
+    async def get_by_email(self, email: str) -> ContactDTO | None:
+        return await self.get(email=email)
 
 
 def get_contact_repository(

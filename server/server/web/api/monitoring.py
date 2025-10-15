@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Response, status
-from server.infra.db.dependencies import get_db_session
 from sqlalchemy import text
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from server.infra.db.dependencies import get_db_session
 
 router = APIRouter()
 

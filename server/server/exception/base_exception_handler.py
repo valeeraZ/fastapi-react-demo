@@ -1,5 +1,6 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
+
 from server.exception.base_exception import (
     NotCreatedError,
     NotDeletedError,

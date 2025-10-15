@@ -3,9 +3,9 @@
 1. Have a PostgreSQL database running locally, with the following environment variables set:
 
 ```bash
-POSTGRES_USER=descartes
-POSTGRES_PASSWORD=descartes
-POSTGRES_DB=descartes
+POSTGRES_USER=demo
+POSTGRES_PASSWORD=demo
+POSTGRES_DB=demo
 ```
 
 Or you can use the service in `docker-compose` file in root folder by running
@@ -28,12 +28,18 @@ Then, run the following commands:
 poetry run uvicorn server.web.application:get_app
 ```
 
-# View the API documentation
+## View the API documentation
 
-Launch the server, then go to [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+Launch the server, then go to [http://localhost:8000/docs](http://localhost:8000/docs)
 
-# Run the unit tests
+Key endpoints:
 
+- `POST /contacts` — create a contact (requires name and email)
+- `GET /contacts` — list contacts
+- `GET /contacts/by-email?email=you@example.com` — find contact by email
+- `GET /contacts/{name}` — get a contact by name
+
+## Run the unit tests
 
 ```bash
 poetry run python -m unittest discover

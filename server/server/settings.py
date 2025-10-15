@@ -42,10 +42,18 @@ class Settings(BaseSettings):
     # Variables for the database, values are set by default
     db_host: str = "localhost"
     db_port: int = 5432
-    db_user: str = "descartes"
-    db_pass: str = "descartes"
-    db_base: str = "descartes"
+    db_user: str = "demo"
+    db_pass: str = "demo"
+    db_base: str = "demo"
     db_echo: bool = False
+
+    # Database connection pool settings
+    db_pool_size: int = 10
+    db_max_overflow: int = 20
+    db_pool_timeout: int = 30
+    db_pool_recycle: int = 3600  # 1 hour
+    db_query_timeout: int = 60
+    db_schema: str = "public"
 
     @property
     def db_url(self) -> URL:
@@ -65,7 +73,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = "../.env"
-        env_prefix = "DESCARTES_"
+        env_prefix = "demo_"
         env_file_encoding = "utf-8"
 
 

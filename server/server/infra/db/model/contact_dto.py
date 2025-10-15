@@ -1,18 +1,21 @@
 from datetime import datetime
 
-from server.infra.db.model.base import Base
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
+
+from server.infra.db.model.base import Base
 
 
 class ContactDTO(Base):
     __tablename__ = "contact"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    # Use 'name' as primary key instead of id
+    name: Mapped[str] = mapped_column(String(255), primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     first_name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
     job: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
-    question: Mapped[str] = mapped_column(Text, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
